@@ -3,14 +3,12 @@ var ObjectId = require('mongodb').ObjectId;
 var url = "mongodb://localhost:27017/";
 
 var postsCollection;
-var commentsCollection;
 
 MongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
 }).then(async db => {
     postsCollection = db.db("foroDB").collection("postsCollection");
-    commentsCollection = db.db("foroDB").collection("commentsCollection");
 });
 
 async function findAll() {
@@ -35,13 +33,13 @@ async function deletePost(postId) {
 }
 
 async function addComment(postId, comment) {
-    var newComment = await commentsCollection.insertOne(comment);
-    var queryNewComment = { $push: { comments: newComment.ops[0] } };
+    comment._id = new ObjectId();
+    var queryNewComment = { $push: { comments: comment } };
     await postsCollection.updateOne({ _id : new ObjectId(postId)}, queryNewComment);
+    return comment;
 }
 
 async function deleteComment(postId, commentId) {
-    await commentsCollection.deleteOne({ _id : new ObjectId(commentId)});
     var delComment = { $pull: { comments: { _id: new ObjectId(commentId) } } };
     await postsCollection.updateOne({ _id : new ObjectId(postId)}, delComment);
 }

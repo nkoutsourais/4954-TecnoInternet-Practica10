@@ -28,8 +28,8 @@ app.route('/:postId')
         });
 
 app.post('/:postId/comments', async function (req, res) {
-    await repository.addComment(req.params.postId, req.body);
-    res.json(req.body);
+    var comment = await repository.addComment(req.params.postId, req.body);
+    res.json(comment);
 });
 
 app.delete('/:postId/comments/:commentId', async function (req, res) {
